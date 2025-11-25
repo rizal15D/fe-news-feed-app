@@ -9,7 +9,7 @@ const API = axios.create({
 API.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = Cookies.get("token"); // <--- FIX DI SINI
-    console.log("Axios token:", token);
+    // console.log("Axios token:", token);
 
     if (token) config.headers.Authorization = `Bearer ${token}`;
   }
