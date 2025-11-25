@@ -1,5 +1,7 @@
 // Base URL backend NestJS kamu di port 8000
-export const API_BASE_URL = "http://localhost:8000/api";
+export const API_BASE_URL = `${
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+}/api`;
 
 // Auth
 export const API_LOGIN = `${API_BASE_URL}/login`;
