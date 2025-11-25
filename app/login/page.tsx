@@ -8,6 +8,7 @@ import { setAuthToken } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -23,38 +24,50 @@ export default function LoginPage() {
       const token = res.data?.access_token;
 
       if (token) {
-        setAuthToken(token); // <-- simpan ke cookie
+        setAuthToken(token); // simpan ke cookie
         router.push("/feed");
       }
-    } catch (error: any) {
-      alert("Login gagal!");
+    } catch (error) {
+      alert("Login gagal! Pastikan username/password benar.");
     }
   };
 
   return (
-    <div className="p-6">
-      <h1>Login</h1>
+    <div className="min-h-screen flex items-center justify-center">
+      <form
+        onSubmit={handleLogin}
+        className="w-80 p-6 border rounded-lg shadow"
+      >
+        <h1 className="text-xl font-semibold mb-4 text-center">Login</h1>
 
-      <form onSubmit={handleLogin}>
         <input
-          placeholder="username"
-          className="block border p-2 my-2"
+          placeholder="Username"
+          className="w-full border p-2 rounded mb-3"
+          value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
 
         <input
-          placeholder="password"
+          placeholder="Password"
           type="password"
-          className="block border p-2 my-2"
+          className="w-full border p-2 rounded mb-3"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="w-full bg-blue-600 text-white py-2 rounded"
         >
           Login
         </button>
+
+        <p className="text-center mt-3 text-sm">
+          Belum punya akun?{" "}
+          <a href="/register" className="text-blue-600">
+            Register
+          </a>
+        </p>
       </form>
     </div>
   );
