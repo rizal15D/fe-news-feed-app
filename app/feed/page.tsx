@@ -64,27 +64,6 @@ export default function FeedPage() {
 
   return (
     <div className="min-h-screen bg-black text-white p-4">
-      {/* Navbar */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-bold">Your Feed</h1>
-
-        <div className="flex gap-4">
-          <Link
-            href="/explore"
-            className="text-blue-400 hover:text-blue-300 font-semibold"
-          >
-            Explore
-          </Link>
-
-          <button
-            onClick={handleLogout}
-            className="text-red-400 hover:text-red-300 font-semibold"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
-
       {/* Posts */}
       <div className="max-w-xl mx-auto space-y-4">
         {posts.length === 0 ? (
