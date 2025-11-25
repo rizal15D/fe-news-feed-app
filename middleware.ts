@@ -1,37 +1,29 @@
+//middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
   const token = req.cookies.get("token")?.value;
+  console.log("Middleware - token:", token);
+  const { pathname } = req.nextUrl;
 
-  // Redirect root "/" → "/login"
+  // Redirect dari "/" → "/login"
   if (pathname === "/") {
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
-
-  const isAuthPage =
-    pathname.startsWith("/login") || pathname.startsWith("/register");
-  const isProtectedPage = pathname.startsWith("/feed");
-
-  // Sudah login tapi masuk auth page → redirect ke feed
-  if (token && isAuthPage) {
     return NextResponse.redirect(new URL("/feed", req.url));
   }
 
-  // Belum login tapi akses feed → redirect login
-  if (!token && isProtectedPage) {
+  // Jangan injure middleware jika client belum sempat set cookie
+  if (!token && pathname.startsWith("/feed")) {
     return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  if (token && (pathname === "/login" || pathname === "/register")) {
+    return NextResponse.redirect(new URL("/feed", req.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/", // <--- penting, agar root ikut diproses middleware
-    "/login",
-    "/register",
-    "/feed/:path*",
-  ],
+  matcher: ["/", "/feed/:path*", "/login", "/register"],
 };
