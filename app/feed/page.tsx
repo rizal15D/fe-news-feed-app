@@ -3,33 +3,45 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import API from "@/lib/api";
-import { API_FEED } from "@/lib/api-endpoints";
+import { API_FEED, API_UNFOLLOW } from "@/lib/api-endpoints";
 import Cookies from "js-cookie";
 
 interface Post {
   id: number;
-  userid: number;
   content: string;
   createdat: string;
+  userid: number;
 }
 
 export default function FeedPage() {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
   const fetchFeed = async () => {
     try {
-      const res = await API.get(API_FEED(page, 10));
+      const res = await API.get(API_FEED(1, 10));
+      const data = res.data?.posts ?? [];
 
-      console.log("Feed response:", res.data);
+      const sorted = data.sort(
+        (a: Post, b: Post) =>
+          new Date(b.createdat).getTime() - new Date(a.createdat).getTime()
+      );
 
-      setPosts(res.data.posts ?? []);
+      setPosts(sorted);
     } catch (err) {
       console.error("Error fetching feed:", err);
     }
     setLoading(false);
+  };
+
+  const handleUnfollow = async (userid: number) => {
+    try {
+      await API.delete(API_UNFOLLOW(userid));
+      fetchFeed();
+    } catch (err) {
+      console.error("Error unfollow:", err);
+    }
   };
 
   const handleLogout = () => {
@@ -45,55 +57,58 @@ export default function FeedPage() {
     }
 
     fetchFeed();
-  }, [page]);
+  }, []);
 
-  if (loading) return <p className="p-6 text-center">Loading...</p>;
+  if (loading) return <p className="p-6 text-center text-white">Loading...</p>;
 
   return (
-    <div className="max-w-xl mx-auto p-4">
+    <div className="min-h-screen bg-black text-white p-4">
       {/* Navbar */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="max-w-xl mx-auto flex justify-between items-center mb-6">
         <h1 className="text-xl font-bold">Your Feed</h1>
-        <button onClick={handleLogout} className="text-red-600 font-semibold">
+        <button
+          onClick={handleLogout}
+          className="text-red-400 font-semibold hover:text-red-300"
+        >
           Logout
         </button>
       </div>
 
       {/* Posts */}
-      <div className="space-y-4">
+      <div className="max-w-xl mx-auto space-y-4">
         {posts.length === 0 ? (
-          <p className="text-center text-gray-500">Belum ada postingan.</p>
+          <p className="text-center text-gray-400">
+            Feed kosong. Follow beberapa user dulu.
+          </p>
         ) : (
           posts.map((post) => (
-            <div key={post.id} className="border rounded-lg p-4 shadow-sm">
-              <p className="font-semibold">UserID #{post.userid}</p>
+            <div
+              key={post.id}
+              className="border border-gray-700 rounded-lg p-4 bg-[#111] shadow-md"
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-semibold text-gray-200">
+                    User #{post.userid}
+                  </p>
 
-              <p className="my-1">{post.content}</p>
+                  <p className="my-2 text-gray-300">{post.content}</p>
 
-              <p className="text-xs text-gray-500">
-                {new Date(post.createdat).toLocaleString()}
-              </p>
+                  <p className="text-xs text-gray-500">
+                    {new Date(post.createdat).toLocaleString()}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => handleUnfollow(post.userid)}
+                  className="text-sm px-3 py-1 bg-red-600 hover:bg-red-500 text-white rounded-lg"
+                >
+                  Unfollow
+                </button>
+              </div>
             </div>
           ))
         )}
-      </div>
-
-      {/* Pagination */}
-      <div className="flex justify-between mt-6">
-        <button
-          disabled={page <= 1}
-          onClick={() => setPage((p) => p - 1)}
-          className="px-4 py-2 border rounded disabled:opacity-40"
-        >
-          Prev
-        </button>
-
-        <button
-          onClick={() => setPage((p) => p + 1)}
-          className="px-4 py-2 border rounded"
-        >
-          Next
-        </button>
       </div>
     </div>
   );
