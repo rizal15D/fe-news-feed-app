@@ -1,5 +1,3 @@
-// app/feed/page.tsx
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,24 +8,24 @@ import Cookies from "js-cookie";
 
 interface Post {
   id: number;
+  userid: number;
   content: string;
-  createdAt: string;
-  user: {
-    id: number;
-    username: string;
-  };
+  createdat: string;
 }
 
 export default function FeedPage() {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
   const fetchFeed = async () => {
     try {
-      const res = await API.get(API_FEED(1, 10)); // page 1, limit 20
-      console.log("Feed response:", res);
-      setPosts(res.data?.data ?? []); // sesuaikan dengan API backendmu
+      const res = await API.get(API_FEED(page, 10));
+
+      console.log("Feed response:", res.data);
+
+      setPosts(res.data.posts ?? []);
     } catch (err) {
       console.error("Error fetching feed:", err);
     }
@@ -47,7 +45,7 @@ export default function FeedPage() {
     }
 
     fetchFeed();
-  }, []);
+  }, [page]);
 
   if (loading) return <p className="p-6 text-center">Loading...</p>;
 
@@ -62,21 +60,41 @@ export default function FeedPage() {
       </div>
 
       {/* Posts */}
-      {/* <div className="space-y-4">
+      <div className="space-y-4">
         {posts.length === 0 ? (
           <p className="text-center text-gray-500">Belum ada postingan.</p>
         ) : (
           posts.map((post) => (
             <div key={post.id} className="border rounded-lg p-4 shadow-sm">
-              <p className="font-semibold">@{post.user.username}</p>
+              <p className="font-semibold">UserID #{post.userid}</p>
+
               <p className="my-1">{post.content}</p>
+
               <p className="text-xs text-gray-500">
-                {new Date(post.createdAt).toLocaleString()}
+                {new Date(post.createdat).toLocaleString()}
               </p>
             </div>
           ))
         )}
-      </div> */}
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-between mt-6">
+        <button
+          disabled={page <= 1}
+          onClick={() => setPage((p) => p - 1)}
+          className="px-4 py-2 border rounded disabled:opacity-40"
+        >
+          Prev
+        </button>
+
+        <button
+          onClick={() => setPage((p) => p + 1)}
+          className="px-4 py-2 border rounded"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
