@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import API from "@/lib/api";
 import { API_FEED, API_UNFOLLOW } from "@/lib/api-endpoints";
 import Cookies from "js-cookie";
-import Link from "next/link";
 
 interface Post {
   id: number;
@@ -18,6 +17,10 @@ export default function FeedPage() {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Modal Create Post
+  const [openModal, setOpenModal] = useState(false);
+  const [content, setContent] = useState("");
 
   const fetchFeed = async () => {
     try {
@@ -45,9 +48,19 @@ export default function FeedPage() {
     }
   };
 
-  const handleLogout = () => {
-    Cookies.remove("token");
-    router.push("/login");
+  const createPost = async () => {
+    if (!content.trim()) return alert("Post cannot be empty");
+
+    try {
+      await API.post("/post", { content });
+
+      setContent("");
+      setOpenModal(false);
+      fetchFeed(); // refresh feed setelah post
+    } catch (err) {
+      console.error("Create post error:", err);
+      alert("Failed to create post");
+    }
   };
 
   useEffect(() => {
@@ -63,8 +76,8 @@ export default function FeedPage() {
   if (loading) return <p className="p-6 text-center text-white">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-black text-white p-4">
-      {/* Posts */}
+    <div className="min-h-screen bg-black text-white p-4 relative">
+      {/* Feed List */}
       <div className="max-w-xl mx-auto space-y-4">
         {posts.length === 0 ? (
           <p className="text-center text-gray-400">
@@ -100,6 +113,46 @@ export default function FeedPage() {
           ))
         )}
       </div>
+
+      {/* Floating Create Button */}
+      <button
+        onClick={() => setOpenModal(true)}
+        className="fixed bottom-6 right-6 w-14 h-14 flex items-center justify-center rounded-full bg-blue-600 hover:bg-blue-500 text-white text-3xl shadow-xl"
+      >
+        +
+      </button>
+
+      {/* Modal Create Post */}
+      {openModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-[#111] border border-gray-700 p-6 rounded-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Create Post</h2>
+
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full h-32 p-3 rounded bg-black border border-gray-700 text-white outline-none"
+              placeholder="What's happening?"
+            />
+
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => setOpenModal(false)}
+                className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={createPost}
+                className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500"
+              >
+                Post
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
