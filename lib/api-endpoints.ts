@@ -8,7 +8,7 @@ export const API_LOGIN = `${API_BASE_URL}/login`;
 export const API_REGISTER = `${API_BASE_URL}/register`;
 
 // Posts
-export const API_POSTS = `${API_BASE_URL}/posts`;
+export const API_POSTS = `${API_BASE_URL}/post`;
 
 // FOLLOW = POST
 export const API_FOLLOW = (userId: number) =>

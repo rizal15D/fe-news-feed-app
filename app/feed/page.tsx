@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import API from "@/lib/api";
-import { API_FEED, API_UNFOLLOW } from "@/lib/api-endpoints";
+import { API_FEED, API_UNFOLLOW, API_POSTS } from "@/lib/api-endpoints";
 import Cookies from "js-cookie";
 
 interface Post {
@@ -52,7 +52,7 @@ export default function FeedPage() {
     if (!content.trim()) return alert("Post cannot be empty");
 
     try {
-      await API.post("/post", { content });
+      await API.post(API_POSTS, { content });
 
       setContent("");
       setOpenModal(false);
