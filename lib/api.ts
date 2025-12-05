@@ -8,7 +8,7 @@ const API = axios.create({
 
 API.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
-    const token = Cookies.get("token"); // <--- FIX DI SINI
+    const token = Cookies.get("token");
     // console.log("Axios token:", token);
 
     if (token) config.headers.Authorization = `Bearer ${token}`;
@@ -23,7 +23,7 @@ API.interceptors.response.use(
 
     if (status === 401) {
       console.log("401 detected. Clearing cookie...");
-      Cookies.remove("token"); // <--- FIX TAMBAHAN
+      Cookies.remove("token");
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }

@@ -22,7 +22,7 @@ export default function RegisterPage() {
       });
 
       alert("Registrasi berhasil! Silakan login.");
-      router.push("/login"); // <-- LANGSUNG KE LOGIN
+      router.push("/login");
     } catch (error) {
       alert("Register gagal! Username mungkin sudah dipakai.");
     }

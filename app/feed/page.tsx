@@ -56,7 +56,7 @@ export default function FeedPage() {
 
       setContent("");
       setOpenModal(false);
-      fetchFeed(); // refresh feed setelah post
+      fetchFeed(); // refresh
     } catch (err) {
       console.error("Create post error:", err);
       alert("Failed to create post");

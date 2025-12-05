@@ -1,4 +1,3 @@
-// lib/auth.ts
 import Cookies from "js-cookie";
 
 export function setAuthToken(token: string) {
