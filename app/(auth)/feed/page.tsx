@@ -22,21 +22,34 @@ export default function FeedPage() {
   const [openModal, setOpenModal] = useState(false);
   const [content, setContent] = useState("");
 
-  const fetchFeed = async () => {
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const LIMIT = 10;
+
+  const fetchFeed = async (newPage = 1) => {
     try {
-      const res = await API.get(API_FEED(1, 10));
-      const data = res.data?.posts ?? [];
+      const res = await API.get(API_FEED(newPage, LIMIT));
+      const data: Post[] = res.data?.posts ?? [];
 
-      const sorted = data.sort(
-        (a: Post, b: Post) =>
-          new Date(b.createdat).getTime() - new Date(a.createdat).getTime()
-      );
+      // kalau tidak ada data, berarti sudah habis
+      if (data.length < LIMIT) setHasMore(false);
 
-      setPosts(sorted);
+      // jika newPage = 1 → refresh
+      if (newPage === 1) {
+        setPosts(data);
+      } else {
+        setPosts((prev) => [...prev, ...data]);
+      }
     } catch (err) {
       console.error("Error fetching feed:", err);
     }
     setLoading(false);
+  };
+
+  const loadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchFeed(nextPage);
   };
 
   const handleUnfollow = async (userid: number) => {
@@ -70,7 +83,7 @@ export default function FeedPage() {
       return;
     }
 
-    fetchFeed();
+    fetchFeed(1);
   }, []);
 
   if (loading) return <p className="p-6 text-center text-white">Loading...</p>;
@@ -113,6 +126,17 @@ export default function FeedPage() {
           ))
         )}
       </div>
+
+      {hasMore && (
+        <div className="text-center mt-6">
+          <button
+            onClick={loadMore}
+            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg"
+          >
+            Load more
+          </button>
+        </div>
+      )}
 
       {/* Floating Create Button */}
       <button
