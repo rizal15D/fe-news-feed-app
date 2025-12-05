@@ -2,18 +2,19 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
-  const token = req.cookies.get("token")?.value;
-  const { pathname } = req.nextUrl;
+  const token = req.cookies.get("token")?.value || null;
+  const path = req.nextUrl.pathname;
 
-  if (pathname === "/") {
-    return NextResponse.redirect(new URL("/feed", req.url));
-  }
+  const isAuth = path.startsWith("/feed") || path.startsWith("/explore");
+  const isNonAuth = path.startsWith("/login") || path.startsWith("/register");
 
-  if (!token && pathname.startsWith("/feed")) {
+  // Jika butuh login tetapi tidak ada token → redirect ke login
+  if (isAuth && !token) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  if (token && (pathname === "/login" || pathname === "/register")) {
+  // Jika sudah login tetapi masuk login/register → redirect ke feed
+  if (isNonAuth && token) {
     return NextResponse.redirect(new URL("/feed", req.url));
   }
 
@@ -21,5 +22,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/feed/:path*", "/login", "/register"],
+  matcher: ["/feed/:path*", "/explore/:path*", "/login", "/register"],
 };

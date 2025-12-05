@@ -15,26 +15,14 @@ export default function Navbar() {
   return (
     <nav className="bg-[#111] border-b border-gray-700 p-4 text-white">
       <div className="max-w-2xl mx-auto flex justify-between items-center">
-        {/* Logo */}
         <Link href="/feed" className="font-bold text-lg">
           NewsFeed
         </Link>
 
-        {/* Links */}
         <div className="flex items-center gap-4">
-          <Link href="/feed" className="hover:text-gray-300">
-            Feed
-          </Link>
-
-          <Link href="/explore" className="hover:text-gray-300">
-            Explore
-          </Link>
-
-          {/* Logout button */}
-          <button
-            onClick={handleLogout}
-            className="text-red-400 hover:text-red-300"
-          >
+          <Link href="/feed">Feed</Link>
+          <Link href="/explore">Explore</Link>
+          <button onClick={handleLogout} className="text-red-400">
             Logout
           </button>
         </div>
