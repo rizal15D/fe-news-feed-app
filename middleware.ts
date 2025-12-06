@@ -8,7 +8,13 @@ export function middleware(req: NextRequest) {
   const isAuth = path.startsWith("/feed") || path.startsWith("/explore");
   const isNonAuth = path.startsWith("/login") || path.startsWith("/register");
 
-  // Jika butuh login tetapi tidak ada token → redirect ke login
+  if (path === "/") {
+    if (!token) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+    return NextResponse.redirect(new URL("/feed", req.url));
+  }
+
   if (isAuth && !token) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
@@ -22,5 +28,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/feed/:path*", "/explore/:path*", "/login", "/register"],
+  matcher: ["/", "/feed/:path*", "/explore/:path*", "/login", "/register"],
 };
