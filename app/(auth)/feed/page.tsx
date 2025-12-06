@@ -10,7 +10,8 @@ interface Post {
   id: number;
   content: string;
   createdat: string;
-  userid: number;
+  userId: number;
+  username: string;
 }
 
 export default function FeedPage() {
@@ -105,7 +106,7 @@ export default function FeedPage() {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="font-semibold text-gray-200">
-                    User #{post.userid}
+                    @{post.username}
                   </p>
 
                   <p className="my-2 text-gray-300">{post.content}</p>
@@ -116,7 +117,7 @@ export default function FeedPage() {
                 </div>
 
                 <button
-                  onClick={() => handleUnfollow(post.userid)}
+                  onClick={() => handleUnfollow(post.userId)}
                   className="text-sm px-3 py-1 bg-red-600 hover:bg-red-500 text-white rounded-lg"
                 >
                   Unfollow
